@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   List,
@@ -24,7 +24,57 @@ const StyledList = styled(List)(({ theme }) => ({
   },
 }));
 
+const data= [
+    {
+      avatar: "https://randomuser.me/api/portraits/men/91.jpg",
+      username: "john Doe",
+      lastMessage: "hello ",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/94.jpg",
+      username: "sarah mircle",
+      lastMessage: "hello ",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+      username: "jacob putin",
+      lastMessage: "hello ",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+      username: "lara crofy",
+      lastMessage: "hello ",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+      username: "lara crofy",
+      lastMessage: "hello ",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+      username: "lara crofy",
+      lastMessage: "hello ",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+      username: "lara crofy",
+      lastMessage: "hello ",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+      username: "lara crofy",
+      lastMessage: "hello ",
+    },
+  ]
+
 function FriendsBar() {
+const [inputText, setInputText] = useState("");
+  const [listFriends, setListFriends] = useState(data);
+    useEffect(() => {
+      if (inputText === "") {
+        setListFriends(data);
+      }
+    }, [inputText, data]);
   const theme = useTheme();
 
   return (
@@ -46,6 +96,19 @@ function FriendsBar() {
         }}
       >
         <InputBase
+          value={inputText}
+          onChange={(event) => {
+            const inputText = event.target.value.toLowerCase();
+            setInputText(inputText);
+            setInputText(inputText);
+            // Filter the list based on the typed text
+            const filteredList = data.filter((friend) =>
+              friend.username.toLowerCase().includes(inputText)
+            );
+
+            setListFriends(filteredList);
+
+          }}
           placeholder="Search ..."
           sx={{
             color: theme.palette.text,
@@ -61,398 +124,36 @@ function FriendsBar() {
       </Box>
 
       <StyledList>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/91.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
+        {listFriends.map((friend,index) => (
+          <ListItemButton key={index} sx={{ width: "100%", padding: 0 }}>
+            <ListItem
+              sx={{
+                padding: { xs: 0, md: 4 },
+                paddingLeft: 1,
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
               }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/men/3.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/men/19.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/men/66.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/94.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
-        <ListItemButton sx={{ width: "100%", padding: 0 }}>
-          <ListItem
-            sx={{
-              padding:{xs:0,md:4},
-              paddingLeft: 1,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar src="https://randomuser.me/api/portraits/women/9.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle1,
-                color: theme.palette.text,
-              }}
-              secondaryTypographyProps={{
-                fontFamily: theme.typography.fontFamily,
-                fontSize: theme.typography.subtitle2,
-                color: theme.palette.subText,
-              }}
-              primary=" USER NAME"
-              secondary="last message"
-            />
-          </ListItem>
-        </ListItemButton>
+            >
+              <ListItemAvatar>
+                <Avatar src={friend.avatar} />
+              </ListItemAvatar>
+              <ListItemText
+                primaryTypographyProps={{
+                  fontFamily: theme.typography.fontFamily,
+                  fontSize: theme.typography.subtitle1,
+                  color: theme.palette.text,
+                }}
+                secondaryTypographyProps={{
+                  fontFamily: theme.typography.fontFamily,
+                  fontSize: theme.typography.subtitle2,
+                  color: theme.palette.subText,
+                }}
+                primary={friend.username}
+                secondary={friend.lastMessage}
+              />
+            </ListItem>
+          </ListItemButton>
+        ))}
       </StyledList>
     </Box>
   );

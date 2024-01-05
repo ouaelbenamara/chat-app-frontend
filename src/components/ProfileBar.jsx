@@ -3,10 +3,14 @@ import React from 'react'
 
 function ProfileBar() {
   return (
-    <Box flexGrow={1} bgcolor={'success'}>
+    <Box 
+    
+      // sx={{ maxWidth: { xs: 100, md: 300 } }}
+      bgcolor={"success"}
+    >
       content
     </Box>
-  )
+  );
 }
 
 export default ProfileBar

@@ -1,21 +1,23 @@
 import React from 'react';
-import { Box, colors } from '@mui/material';
+import { Box } from '@mui/material';
 import Navbar from './components/RightBar';
 import FriendsBar from './components/FriendsBar';
-import ProfileBar from './components/ProfileBar';
-import ChatBar from './components/ChatBar';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { SocketProvider } from './network/socket';
-import { purple } from '@mui/material/colors';
-import { Palette } from '@mui/icons-material';
+import ChatBar from './components/Chatbar/ChatBar';
 
+import { ThemeProvider, createTheme } from '@mui/material';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import Home from './components/Home';
+import Register from './components/Register';
+import RequireAuth from './components/RequireAuth';
 const theme = createTheme({
   palette: {
     secondary: { main: "#1842AB", },
     primary: { main: "#0C2A76" },
-    text: 'white',
-    subText: '#EAEAEA',
-    green:'green'
+    success: { main: '#008823' }
+    // grey: { main: '#F0ECEC' },
+    // text: 'white',
+    // subText: '#EAEAEA',
+    // green: { main: 'green'},
   },
   typography: {
     fontFamily: "cursive",
@@ -44,16 +46,39 @@ const theme = createTheme({
 });
 
 function App() {
+
   return (
     <ThemeProvider theme={theme}>
-      <Box className="App" minWidth={'100%'} minHeight={'100%'} display={'flex'} flexDirection={'row'} overflow={'hidden'}>
-        <Navbar />
-        <FriendsBar />
-        <ChatBar />
-        <ProfileBar />
+      <Box className="App" sx={{
+        boxSizing: 'border-box',
+      }} display={'flex'} flexDirection={'row'} >
+        <Router>
+          <Routes>
+            {/* public routes */}
+            <Route path='/' element={<Home />} />
+            <Route path='/Register' element={<Register />} />
+            {/* protected routes */}
+            <Route  element={<RequireAuth />}>
+              <Route path='/chats' element={<ChatBar />} />
+            </Route>
+
+          </Routes>
+        </Router>
+
       </Box>
-    </ThemeProvider>
-  );
+
+     </ThemeProvider>  
+    );
+
+//     {/* 
+      
+//         <Navbar />
+//         <FriendsBar  />
+//         <ChatBar />
+//         {/* <ProfileBar />
+// //  */} 
+
+
 }
 
 export default App;
