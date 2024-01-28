@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { StyledBox } from './styles'
 import { Check, RemoveRedEye } from '@mui/icons-material'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { setCredentials, logOut } from '../../features/users/userSlice'
+import { logOut, setCredentials } from '../../features/users/userSlice'
 import { useSelector ,useDispatch} from 'react-redux';
 import { selectUser } from '../../features/users/userSlice'
 import { useLogInUserMutation } from '../../app/api/apiSlice';
@@ -29,7 +29,6 @@ function Home() {
     if (location.state && location.state.registrationSuccess) {
       setShowSuccessAlert(true);
       navigate({
-        pathname: location.pathname,
         state: {},
         replace: true,
       });
@@ -38,11 +37,12 @@ function Home() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const { data } = await logInUser(formData);
-    const user = data.user;
-    const token = data.token
+    await logInUser(formData);
+    const { data } = logInUserResult
+    const user = data?.user;
+    const token = data?.token
     console.log('tokenmm=',token)
-    if (data.user && data.token) {
+    if (data?.user && data?.token) {
       console.log('entred')
       const payload = {
         user:user,
@@ -76,9 +76,12 @@ function Home() {
     if (logInUserResult.isError) {
       if (logInUserResult.error.status === 401) {
         setDialogMessage('Email or password are incorrect')
+        dispatch(logOut())
 
       } else {
         setDialogMessage('Unknown error occurred')
+        dispatch(logOut())
+
 
       }
       setDialogType("Error")
@@ -87,6 +90,8 @@ function Home() {
       setDialogOpen(false)
 
       if (logInUserResult.status === 'fulfilled') {
+        dispatch(setCredentials({ user: logInUserResult.data.user, token: logInUserResult.data.token }))
+        // console.log(logInUserResult)
         navigate('/chats');
         console.log('login successful')
       }
@@ -153,6 +158,7 @@ function Home() {
           Registration successful! You can now log in.
         </Alert>
       )}
+      
       <CustomDialog message={dialogMessage} isOpen={dialogOpen} type={dialogType} />
 
     </StyledBox>

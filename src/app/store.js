@@ -3,18 +3,36 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { apiSlice } from "./api/apiSlice";
 import userReducer from "../features/users/userSlice";
-
-const persistConfig = {
-    key: "root",
+import chatReducer from '../features/Chats/chatSlice'
+import usersReducer from '../features/users/allUsersSlice'
+import selectedFriendReducer from '../features/users/selectedFriendSlice'
+const userPersistConfig = {
+    key: "user",
     storage,
-    whitelist: ["user", "token"], // List of reducers to persist, in this case, "user"
+    whitelist: ["user", "token"], // List of reducers to persist,
 };
 
-const persistedReducer = persistReducer(persistConfig, userReducer);
+// const chatPersistConfig = {
+//     key: "chat",
+//     storage,
+//     whitelist: ["distination",'message'], // List of reducers to persist,
+// };
+const usersPersistConfig = {
+    key: "allUsers",
+    storage,
+    whitelist: ["users"], // List of reducers to persist,
+};
+
+const userPersistedReducer = persistReducer(userPersistConfig, userReducer);
+// const chatPersistedReducer = persistReducer(chatPersistConfig, chatReducer);
+const usersPersistedReducer = persistReducer(usersPersistConfig, usersReducer);
+// const selectedFriendPersistedReducer = persistReducer(selectedFriendPersistConfig, selectedFriendReducer );
 
 export const store = configureStore({
     reducer: {
-        user: persistedReducer,
+        chat: chatReducer,
+        user: userPersistedReducer,
+        allUsers: usersPersistedReducer,
         [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>

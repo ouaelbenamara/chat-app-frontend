@@ -4,9 +4,10 @@ import { useEffect } from "react";
 
 const RequireAuth = () => {
     const isAuth = useAuth();
-    useEffect(()=>{console.log(isAuth)},[isAuth])
     const location = useLocation();
-    console.log(isAuth)
+    useEffect(()=>{
+        console.log(isAuth)
+    },[isAuth])
     return (
        isAuth!==null ? isAuth
             ? <Outlet />

@@ -28,4 +28,6 @@ export const StyledMessageContent = styled(Typography)(({ theme }) => ({
     backgroundColor: theme.palette.primary.main,
     overflowWrap: "break-word",
     textAlign: "center",
+    wordWrap: "break-word",
+
 }));
