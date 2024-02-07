@@ -1,13 +1,16 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { selectToken } from '../../features/users/userSlice';
+import { SignalCellularNullOutlined } from '@mui/icons-material';
+// import { userId } from '../../components/Chatbar/ChatBar';
+// const userId = sessionStorage.getItem('userId')
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({
         baseUrl: 'http://localhost:5000/',
         prepareHeaders: (headers, { getState }) => {
-            const token = selectToken(getState()); // Get the token from the Redux store
+            const token = selectToken(getState())// Get the token from the Redux store
             if (token) {
-                // console.log(token)
+                console.log('TOKEN', token)
                 headers.set('token', `${token}`);
             }
             return headers;
@@ -24,7 +27,7 @@ export const apiSlice = createApi({
                 body: data
             })
         }),
-        
+
         getUsers: builder.query({
             query: () => ({
                 url: 'users/',
@@ -52,7 +55,7 @@ export const apiSlice = createApi({
             query: (data) => ({
                 url: `users/update/${data.userId}`,
                 method: 'PUT',
-                body: { email: data?.email, username: data?.username, password: data?.password,image:data?.image }
+                body: { email: data?.email, username: data?.username, password: data?.password, image: data?.image }
             }),
 
         }),
@@ -67,7 +70,7 @@ export const apiSlice = createApi({
         }),
         addRequest: builder.mutation({
             query: ({ sender, destination }) => ({
-            
+
                 url: `users/addRequest`,
                 method: 'POST',
                 body: { sender, destination }
@@ -76,7 +79,7 @@ export const apiSlice = createApi({
         }),
         acceptAddRequest: builder.mutation({
             query: ({ userId, sender }) => ({
-            
+
                 url: `users/addRequest/accept/${userId}`,
                 method: 'POST',
                 body: { sender }
@@ -85,7 +88,7 @@ export const apiSlice = createApi({
         }),
         // removeAddRequest: builder.mutation({
         //     query: ({ userId, sender }) => ({
-            
+
         //         url: `users/addRequest/remove/${userId}`,
         //         method: 'PUT',
         //         body: { sender }
@@ -94,7 +97,7 @@ export const apiSlice = createApi({
         // }),
         removeFriend: builder.mutation({
             query: ({ userId, friendId }) => ({
-            
+
                 url: `users/removeFriend/${userId}`,
                 method: 'PUT',
                 body: { friendId }
@@ -102,11 +105,11 @@ export const apiSlice = createApi({
 
         }),
         getAddRequest: builder.query({
-            query: ( userId) => ({
-            
+            query: (userId) => ({
+
                 url: `users/addRequest/:${userId}`,
                 method: 'GET',
-       
+
             }),
 
         }),
@@ -119,10 +122,11 @@ export const apiSlice = createApi({
 
         }),
 
-        getMessages: builder.query({
-            query: ({userId, distination}) => ({
-                url: `messages/${userId}/${distination}`,
-                method: 'GET',
+        getMessages: builder.mutation({
+            query: ({ userId=null, distination }) => ({
+                url: `messages/${distination}`,
+                method: 'POST',
+                body:{userId}
             }),
 
         }),
@@ -150,7 +154,55 @@ export const apiSlice = createApi({
             }),
 
         }),
-      
+        createRoom: builder.mutation({
+            query: ({ people, roomName }) => ({
+                url: 'rooms/create',
+                method: 'POST',
+                body: { people, roomName }
+            })
+        }),
+        deleteRoom: builder.mutation({
+            query: () => ({
+                url: 'rooms/create',
+                method: 'DELETE',
+            })
+        }),
+        addUserToRoom: builder.mutation({
+            query: ({ usersId, roomId }) => ({
+                url: 'rooms/addUserToRoom',
+                method: 'PUT',
+                body: { usersId, roomId }
+            })
+        }),
+        removeUserFromRoom: builder.mutation({
+            query: ({ userId, roomId }) => ({
+                url: 'rooms/removeUserFromRoom',
+                method: 'PUT',
+                body: { userId, roomId }
+            })
+        }),
+        getRoom: builder.query({
+            query: ({ roomId }) => ({
+                url: `rooms/${roomId}`,
+                method: 'GET',
+            })
+        }),
+        updateRoom: builder.mutation({
+            query: ({ roomImage = null, roomName = null, roomDescription = null, roomId = null }) => ({
+                url: `rooms/update/${roomId}`,
+                method: 'PUT',
+                body: { roomImage, roomName, roomDescription, }
+            })
+        }),
+        getRooms: builder.query({
+            query: ( {userId}  ) => ({
+                url: `rooms/getRooms/${userId}`,
+                method: 'GET',
+            })
+        }),
+
+
+
 
 
 
@@ -161,7 +213,7 @@ export const { useRegisterUserMutation,
     useUpdateUserMutation,
     useLogInUserMutation,
     useGetProtectionQuery,
-    useGetMessagesQuery,
+    useGetMessagesMutation,
     useSignOutUserMutation,
     useUpdateMessageMutation,
     useDeleteMessageMutation,
@@ -171,5 +223,12 @@ export const { useRegisterUserMutation,
     useAddRequestMutation,
     useGetAddRequestQuery,
     useAcceptAddRequestMutation,
-    useRemoveFriendMutation
+    useRemoveFriendMutation,
+    useGetRoomQuery,
+    useAddUserToRoomMutation,
+    useRemoveUserFromRoomMutation,
+    useCreateRoomMutation,
+    useUpdateRoomMutation,
+    useDeleteRoomMutation,
+    useGetRoomsQuery
 } = apiSlice

@@ -9,14 +9,23 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { logOut, setCredentials } from '../../features/users/userSlice'
 import { useSelector ,useDispatch} from 'react-redux';
 import { selectUser } from '../../features/users/userSlice'
-import { useLogInUserMutation } from '../../app/api/apiSlice';
+import { apiSlice, useLogInUserMutation } from '../../app/api/apiSlice';
 import CustomDialog from '../utils/CustomDialog';
-
+import { resetStore } from '../../helpers/functions';
+import userReducer from '../../features/users/userSlice'
+import { injectAsyncReducer, store } from '../../app/store';
 // ... (imports)
 
+
 function Home() {
+
+
+
+
   const dispatch = useDispatch()
-  const user = useSelector(selectUser)
+  // const user =useSelector(selectUser)
+
+
   const [logInUser, logInUserResult] = useLogInUserMutation();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const location = useLocation();
@@ -25,6 +34,11 @@ function Home() {
   const [dialogMessage, setDialogMessage] = useState('');
   const [dialogType, setDialogType] = useState('');
 
+  useEffect(()=>{
+    console.log('HEHEHEHEH')
+    resetStore(dispatch)
+
+  },[])
   useEffect(() => {
     if (location.state && location.state.registrationSuccess) {
       setShowSuccessAlert(true);
@@ -39,6 +53,7 @@ function Home() {
     event.preventDefault();
     await logInUser(formData);
     const { data } = logInUserResult
+    if(logInUserResult.status==='fulfilled'){
     const user = data?.user;
     const token = data?.token
     console.log('tokenmm=',token)
@@ -49,7 +64,7 @@ function Home() {
         token:token
       }
       dispatch(setCredentials(payload))
-    }
+    }}
 
 
   };
@@ -79,6 +94,7 @@ function Home() {
         dispatch(logOut())
 
       } else {
+        console.log(logInUserResult.status)
         setDialogMessage('Unknown error occurred')
         dispatch(logOut())
 
@@ -90,10 +106,18 @@ function Home() {
       setDialogOpen(false)
 
       if (logInUserResult.status === 'fulfilled') {
+        // console.log(logInUserResult.data)
+        localStorage.setItem('userData', JSON.stringify(logInUserResult.data.user))
+        localStorage.setItem('token', JSON.stringify(logInUserResult.data.token))
+        // injectAsyncReducer(store, `user_${logInUserResult.data.user._id}`, userReducer);
+        sessionStorage.setItem('userId', logInUserResult.data.user._id)
         dispatch(setCredentials({ user: logInUserResult.data.user, token: logInUserResult.data.token }))
         // console.log(logInUserResult)
-        navigate('/chats');
-        console.log('login successful')
+
+
+        navigate(`/chats`,);
+        
+        console.log(logInUserResult.data.user._id,'login successful')
       }
 
     }

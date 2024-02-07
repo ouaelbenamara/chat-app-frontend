@@ -2,11 +2,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { logOut, selectToken, setCredentials } from "../features/users/userSlice";
 import { useGetProtectionQuery, useSignOutUserMutation } from "../app/api/apiSlice";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 export const useAuth = () => {
     const dispach = useDispatch()
+    // const {userId} = useParams()
+    const userId = sessionStorage.getItem('userId')
+    console.log('userId: ',userId)
     const [isAuthenticated, setIsAuthenticated] = useState(null); // Use null as an initial value
-    const token = useSelector(selectToken);
+    let name = `user_${userId}`;
+    const token = localStorage.getItem('token')
+console.log('totken',token)
     const { status, isError,error, data } = useGetProtectionQuery();
     const  [signOut,signOutResult] = useSignOutUserMutation();
 
@@ -16,7 +22,7 @@ export const useAuth = () => {
                 if (status === 'fulfilled') {
                     setIsAuthenticated(true);
                 } else if (status === 'rejected') {
-                    console.log('logout',error)
+                    console.log('logouqqqqt',error)
                     dispach(logOut())
 
                     await  signOut()
@@ -36,7 +42,7 @@ export const useAuth = () => {
         };
 
         if (token!==null) {
-            console.log(token)
+            console.log('token: ',token)
             checkAuthentication();
         } else {
             console.log('tonkenene')

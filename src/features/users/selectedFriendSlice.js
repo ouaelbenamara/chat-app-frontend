@@ -13,10 +13,14 @@ export const selectedFriendSlice = createSlice({
         },
         setMessages: (state, action) => {
             state.messages = action.payload
+        },
+        resetSelectedFriend:(state)=>{
+            state.selectedFriend = false
+            state.messages = null
         }
     }
 })
-export const { setSelectedFriend, setMessages } = selectedFriendSlice.actions;
+export const { resetSelectedFriend, setSelectedFriend, setMessages } = selectedFriendSlice.actions;
 export default selectedFriendSlice.reducer;
 export const selecteselectedSelectedFriend = (state) => state.selectedFriend.selectedFriend
 export const selecteMessages = (state) => state.selectedFriendSlice.messages

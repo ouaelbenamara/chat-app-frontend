@@ -1,3 +1,8 @@
+import { resetChat } from "../features/Chats/chatSlice";
+import { resetAllUsers } from "../features/users/allUsersSlice";
+import { resetSelectedFriend } from "../features/users/selectedFriendSlice";
+import { logOut } from "../features/users/userSlice";
+
 export const convertFileToBase64 = (e,setSelectedImage) => {
         const reader = new FileReader();
         reader.readAsDataURL(e.target.files[0]);
@@ -10,3 +15,13 @@ export const convertFileToBase64 = (e,setSelectedImage) => {
         }
 
 };
+
+
+export const resetStore = (dispatch)=>{
+    dispatch(resetChat())
+    dispatch(resetAllUsers())
+    dispatch(resetSelectedFriend())
+    dispatch(logOut())
+    console.log('AGAININNN')
+
+}

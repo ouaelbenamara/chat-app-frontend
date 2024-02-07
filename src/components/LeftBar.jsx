@@ -4,15 +4,17 @@ import React, { useDebugValue, useEffect } from "react";
 import {Chat, Group, Logout} from "@mui/icons-material";
 import { logOut, selectUser } from "../features/users/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,useParams} from "react-router-dom";
 function LeftBar() {
+  const  userId = sessionStorage.getItem('userId');
   const navigate = useNavigate()
-  const user = useSelector(selectUser)
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
 
 
   const handleLogoutClick = ()=>{
    dispatch( logOut())
+   navigate('/')
   }
 
 
@@ -38,7 +40,7 @@ function LeftBar() {
     <StyledRightbar spacing={5}>
       <Avatar
       onClick={()=>{
-                navigate("/profile");
+                navigate(`/profile`);
       }}
         sx={{
           cursor:'pointer',
@@ -50,11 +52,11 @@ function LeftBar() {
         src={user?.image}
         alt="Jane Doe"
       />
-      <StyledIconButton  disableRipple onClick={() => {navigate('/chats')}}>
+      <StyledIconButton  disableRipple onClick={() => {navigate(`/chats`);}}>
         <Chat />
       </StyledIconButton>
       <StyledIconButton onClick={()=>{
-        navigate('/explor')
+        navigate(`/explor`)
       }}>
         <Group  />
       </StyledIconButton>

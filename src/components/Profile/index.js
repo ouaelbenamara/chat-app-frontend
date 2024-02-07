@@ -23,6 +23,7 @@ function Profile() {
     const [openDialog, setOpenDialog] = useState(false)
     const [openDialogUsername, setOpenDialogUsername] = useState(false)
     const [openDialogImage, setOpenDialogImage] = useState(false)
+    const userId = sessionStorage.getItem('userId')
     const user = useSelector(selectUser)
     return (
         <Wrapper>

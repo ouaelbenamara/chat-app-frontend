@@ -14,16 +14,25 @@ export const userSlice = createSlice({
 
         },
         setCredentials: (state, action) => {
-            console.log(action.payload)
+            console.log('calllled',action.payload)
             state.user = action.payload.user
             state.token = action.payload.token
         },
         setUser:(state,action)=>{
+            
             state.user = action.payload
         }
     }
 })
 export const { setCredentials, logOut, setUser } = userSlice.actions;
 export default userSlice.reducer;
-export const selectToken = (state) => state.user.token
-export const selectUser = (state) => state.user.user
+export const selectToken = (state) => {
+    // console.log('state.name', state[`user_${name}`])
+    const userId = sessionStorage.getItem('userId')
+    const name = `user_${userId}`
+    return state.user?.token}
+export const selectUser = (state) => {
+    const userId = sessionStorage.getItem('userId')
+    const name = `user_${userId}`
+// console.log('state here',state)
+    return state.user?.user}

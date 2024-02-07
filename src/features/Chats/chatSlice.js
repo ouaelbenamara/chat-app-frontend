@@ -23,10 +23,14 @@ export const chatSlice = createSlice({
         ,setMessages2:(state,action)=>{
             // console.log(...action.payload)
             state.messages2.push(...action.payload)
+        },resetChat:(state)=>{
+            state.distination = null
+            state.messages1 = []
+            state.messages2 = []
         }
     }
 })
-export const { setChat, setMessages, setDistination, setMessages1, setMessages2 } = chatSlice.actions;
+export const { resetChat, setChat, setMessages, setDistination, setMessages1, setMessages2 } = chatSlice.actions;
 export default chatSlice.reducer;
 export const selectDistination = (state) => state.chat.distination
 export const selectMessage = (state) => state.chat.message

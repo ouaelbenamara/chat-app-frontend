@@ -10,6 +10,7 @@ import { selectDistination } from '../../features/Chats/chatSlice'
 function Explor() {
 
 const dispatch = useDispatch()
+const userId = sessionStorage.getItem('userId')
     const USER = useSelector(selectUser)
 
 const [selectedUser,setSelectedUser]= useState(null)
@@ -25,6 +26,7 @@ const [selectedUser,setSelectedUser]= useState(null)
         }else if(userStatus==='fulfilled'){
             console.log('user:',user)
             dispatch(setUser(user))
+            setUsers()
         }
     },[ user, userStatus])
     
@@ -39,8 +41,11 @@ const [frinds,setFriends] = useState([])
             console.log('failed to load users')
         } else if (status === 'fulfilled'&& USER) {
             data.filter(friend=>friend.id!==USER?._id)
-            // console.log(user)
+
+
             setUsers(data.filter(friend => friend.id !== USER?._id))
+            setUsers(data.filter(USER => !user.friends.includes(USER.id)));
+
             // console.log(requests)
             // console.log(user._id)
             

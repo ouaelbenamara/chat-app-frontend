@@ -16,7 +16,8 @@ function EditPasswordDialog({ isOpen, setIsOpen }) {
   const [loginUser, LoginUserResult] = useLogInUserMutation();
   const [updateUser, updateUserResult] = useUpdateUserMutation();
   const [isDisabled, setIsDisabled] = useState(true);
-  const user = useSelector(selectUser);
+  const userId = sessionStorage.getItem('userId')
+  const user = useSelector(selectUser); 
   const [open, setOpen] = useState(isOpen);
   const [formData, setFormData] = useState({
     currentPassword: "",

@@ -8,26 +8,29 @@ import {
   TextField,
   Input,
 } from "@mui/material";
-import { useUpdateUserMutation } from "../../app/api/apiSlice";
-import { useSelector } from "react-redux";
+import { useCreateRoomMutation } from "../../app/api/apiSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/users/userSlice";
 import { convertFileToBase64 } from "../../helpers/functions";
+import { setRoom } from "../../features/rooms/roomSlice";
 
-function EditProfilImageDialog({ isOpen, setIsOpen }) {
-  const userId = sessionStorage.getItem('userId')
+function CreateRoomDialog({ isOpen, setIsOpen }) {
   const user = useSelector(selectUser);
+  const [roomData, setRoomData] = useState({
+    roomName: "",
+    people: "",
+  });
   const [open, setOpen] = useState(isOpen);
-  const [updateUser, updateUserResult] = useUpdateUserMutation();
+  const [createRoom, createRoomResult] = useCreateRoomMutation();
   const [isDisabled, setIsDisabled] = useState(true);
 
   // const [data, setData] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
-
+  //   const [selectedImage, setSelectedImage] = useState(null);
+  const dispatch = useDispatch();
   const handleClose = () => {
     setOpen(false);
     setIsOpen(false);
     // setData("");
-    setSelectedImage(null);
   };
 
   useEffect(() => {
@@ -35,24 +38,29 @@ function EditProfilImageDialog({ isOpen, setIsOpen }) {
   }, [isOpen]);
 
   useEffect(() => {
-    if (updateUserResult.status === "rejected") {
-      console.log("error while updating user");
-    } else if (updateUserResult.status === "fulfilled") {
-      console.log("user has been updated successfully");
+    if (createRoomResult.status === "rejected") {
+      //   console.log("error while updating user");
+      throw new Error("failed to create room");
+    } else if (createRoomResult.status === "fulfilled") {
+        
+      console.log('room created successfully')
     }
-  }, [updateUserResult]);
+  }, [createRoomResult]);
 
   const handleSave = async () => {
-
-    await updateUser({
-      userId: user._id,
-      image:  selectedImage,
-    }); setOpen(false);
+    console.log(roomData)
+    createRoom({ roomName: roomData.roomName, people: roomData.people });
+    setOpen(false);
     setIsOpen(false);
-  
-}
-   
-  
+  };
+
+  const handleChange = (event) => {
+    console.log(event)
+    setRoomData({
+      roomName: event.target.value,
+      people:[user._id]
+    });
+  };
 
   return (
     <Dialog
@@ -61,42 +69,29 @@ function EditProfilImageDialog({ isOpen, setIsOpen }) {
       open={open}
       onClose={handleClose}
     >
-      <DialogTitle id="dialog-title">Edit Profile</DialogTitle>
+      <DialogTitle id="dialog-title">Create Room</DialogTitle>
       <DialogContent>
-        {/* <TextField
+        <TextField
           onChange={(e) => {
-            setData(e.target.value);
+            handleChange(e);
             setIsDisabled(false);
+            console.log(roomData)
           }}
           autoFocus
           margin="dense"
-          label="Username"
+          label="room name"
           type="text"
           fullWidth
-        /> */}
-        <Input
-          type="file"
-          onChange={(e) => {
-            setIsDisabled(false);
-           convertFileToBase64(e,setSelectedImage)
-// console.log(selectedImage)
-         
-          }}
         />
-        {selectedImage !== "" && selectedImage !== null ? (
-          <img alt="image" src={selectedImage} />
-        ) : (
-          <></>
-        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
         <Button disabled={isDisabled} onClick={handleSave} color="primary">
-          Save
+          create
         </Button>
       </DialogActions>
     </Dialog>
   );
 }
 
-export default EditProfilImageDialog;
+export default CreateRoomDialog;

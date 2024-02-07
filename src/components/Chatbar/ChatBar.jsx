@@ -11,12 +11,13 @@ import {
   Typography,
 } from "@mui/material";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import InfoIcon from "@mui/icons-material/Info";
 import AddIcCallIcon from "@mui/icons-material/AddIcCall";
 import { useTheme } from "@mui/material/styles";
 import { Send } from "@mui/icons-material";
 import io, { connect } from "socket.io-client";
+
 import {
   StyledBox,
   StyledList,
@@ -31,86 +32,104 @@ import {
   setMessages2,
 } from "../../features/Chats/chatSlice";
 import {
+  useGetMessagesMutation,
   useGetMessagesQuery,
   useGetUsersQuery,
   useSaveMessageMutation,
 } from "../../app/api/apiSlice";
-import { setMessages } from "../../features/Chats/chatSlice";
 import { selectAllUsers, setUsers } from "../../features/users/allUsersSlice";
+import { injectAsyncReducer, store } from "../../app/store";
+import { useParams } from "react-router-dom";
+import userReducer from "../../features/users/userSlice";
+import { handleRecieveMessage, setUpNetwork } from "../../services/network";
 //styles
 
 ///////
 // const ENDPOINT = process.env.REACT_APP_ENDPOINT;
 
-var socket;
+export var socket;
 
 function ChatBar() {
+    const messagesQueryRef = useRef(null);
+
+  const { userId } = useParams();
+
+  // injectAsyncReducer(store, 'user', userReducer);
+
+  let name = `user_${userId}`;
+  console.log("HUHUHUHUHU", name);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
 
-    const { status:usersStatus, data :usersData} = useGetUsersQuery();
-    const users = useSelector(selectAllUsers);
+  const { status: usersStatus, data: usersData } = useGetUsersQuery();
+  const users = useSelector(selectAllUsers);
 
-    useEffect(() => {
-      if (usersStatus === "rejected") {
-        console.log("failed to load users");
-       dispatch( setUsers(null));
-      } else if (usersStatus === "fulfilled") {
-        console.log("fulfilled ", usersData);
-        dispatch(setUsers(usersData));
-      }
-      console.log(users);
-    }, [usersStatus, usersData, users, dispatch]);
+  useEffect(() => {
+    if (usersStatus === "rejected") {
+      console.log("failed to load users");
+      dispatch(setUsers(null));
+    } else if (usersStatus === "fulfilled") {
+      console.log("fulfilled ", usersData);
+      dispatch(setUsers(usersData));
+    }
+    console.log(users);
+  }, [usersStatus, usersData, users, dispatch]);
 
   const [saveMessage, saveMessageResult] = useSaveMessageMutation();
-const [messages,setMessages] = useState([])
+  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const user = useSelector(selectUser);
-  const selectedFriend = useSelector(selectDistination);
-    useEffect(() => {
-      setMessages([]);
-    }, [selectedFriend]);
-    
-  const { status, data } = useGetMessagesQuery({
-    userId: user?._id,
-    distination: selectedFriend?.id,
-  });
+  // const user = useSelector(selectUser);
+  const selectedChat = useSelector(selectDistination);
   useEffect(() => {
-    if (status === "rejected") {
+    if(selectedChat){
+    setMessages([]);}
+  }, [selectedChat]);
+
+  const [getMessages,getMessagesResult ] = useGetMessagesMutation();
+  
+  useEffect(() => {
+    if (getMessagesResult.status === "rejected") {
       console.log("failed to load messages");
-    } else if (status === "fulfilled") {
-      console.log("HERRERERERERERE", data);
+    } else if (getMessagesResult.status === "fulfilled") {
+      console.log("HERRERERERERERE", getMessagesResult.data);
       let messageSender = null;
       let messageDestination = null;
-      if (data.messages.length !== 0) {
-        messageSender = data?.messages.filter(
-          (message) => message.sender === user?.id
+      if (getMessagesResult.data.messages.length !== 0) {
+        messageSender = getMessagesResult.data?.messages.filter(
+          (message) => message.sender === user?._id
         );
-        messageDestination = data?.messages.filter(
-          (message) => message.destination !== user?.id
+        messageDestination = getMessagesResult.data?.messages.filter(
+          (message) => message.destination !== selectedChat.destination?._id
         );
         console.log(messageSender, messageDestination);
         if (messageSender || messageDestination) {
           dispatch(setMessages1(messageSender));
           dispatch(setMessages2(messageDestination));
-           setMessages([...messageSender, ...messageDestination]);
-
+          setMessages(getMessagesResult.data.messages);
+          console.log(messages);
+        } else {
+          dispatch(setMessages1([]));
+          dispatch(setMessages2([]));
         }
       }
     }
-  }, [status, data, user, dispatch]);
+  }, [ getMessagesResult, user, dispatch, selectedChat]);
 
   useEffect(() => {
     if (user) {
-      socket = io("http://localhost:5000");
-      socket.emit("setup", user?._id);
+    socket =  setUpNetwork(socket, user, io);
+
       socket.on("connected", () => {
-        console.log("connect with id", socket.id);
-        socket.on("recieve-message", (message, sender) => {
-          console.log(message);
-        });
+        const { message, sender } = handleRecieveMessage(socket);
+        if (message && sender){
+          setMessages((prev) => [...prev, { sender, content: message }]);
+          console.log(messages)
+}
+
       });
     }
   }, [user]);
+  
   useEffect(() => {
     if (saveMessageResult.status === "rejected") {
       console.log("error while sending message");
@@ -118,41 +137,60 @@ const [messages,setMessages] = useState([])
       socket.emit("send-message", {
         message,
         sender: user?._id,
-        distination: selectedFriend,
+        destination: selectedChat._id,
       });
       console.log("fulfilled message");
-      console.log(selectedFriend, user);
-      if(user&& message!==''&&selectedFriend){
-              console.log(selectedFriend, user);
-      dispatch(
-        setMessages2([{
-          sender: user?._id,
-          content: message,
-          destination: selectedFriend?.id,
-        }])
-      );   
-          setMessages((prevMessages) => [
+      console.log(selectedChat, user);
+      if (user && message !== "" && selectedChat) {
+        console.log(selectedChat, user);
+        dispatch(
+          setMessages2([
+            {
+              sender: user?._id,
+              content: message,
+              destination: selectedChat?._id,
+            },
+          ])
+        );
+        setMessages((prevMessages) =>{
+          console.log([
             ...prevMessages,
             {
               sender: user?._id,
               content: message,
-              destination: selectedFriend?.id,
+              destination: selectedChat?._id,
             },
           ]);
-      
-      setMessage("");
+          
+          return  [
+          ...prevMessages,
+          {
+            sender: user?._id,
+            content: message,
+            destination: selectedChat?._id,
+          },
+        ]});
+                  console.log(messages);
+
+
+        setMessage("");
+      }
     }
+  }, [dispatch, saveMessageResult, selectedChat, user]);
+  useEffect(()=>{
 
 
-                     
-
-    }
-  }, [dispatch, saveMessageResult, selectedFriend, user]);
-
+    getMessages(  { // userId: user?._id,
+    distination: selectedChat?._id,
+  })
+  },[selectedChat])
+// useEffect(()=>{
+// console.log('data',data)
+// },[data])
   const theme = useTheme();
   return (
     <StyledBox overflow={"hidden"} flex={1}>
-      {selectedFriend ? (
+      {selectedChat ? (
         <>
           <Stack
             sx={{ position: "sticky", justifyContent: "space-between" }}
@@ -162,10 +200,10 @@ const [messages,setMessages] = useState([])
           >
             <Box direction={"row"}>
               <Badge variant="dot" color="success">
-                <Avatar src={selectedFriend?.image} />
+                <Avatar src={selectedChat?.image} />
               </Badge>
               <Typography sx={{ fontSize: "small" }}>
-                {selectedFriend?.username}
+                {selectedChat?.username}
               </Typography>
             </Box>
             <ButtonGroup>
@@ -183,9 +221,11 @@ const [messages,setMessages] = useState([])
           <Divider />
           <Box flex={1} sx={{ overflowY: "scroll" }}>
             <StyledList>
-              {messages.length!==0 ? (
+              {messages.length !== 0 ? (
                 messages.map((message, index) =>
-                  message?.sender === user?._id ? (
+            
+              {   console.log(message.sender,user._id)
+                 return message?.sender === user?._id ? (
                     <StyledMessage
                       key={index}
                       elevation={0}
@@ -203,32 +243,18 @@ const [messages,setMessages] = useState([])
                       elevation={0}
                       position={"flex-end"}
                     >
-                      <Avatar src={selectedFriend?.image} />
+                      <Avatar src={selectedChat?.image} />
 
                       <StyledMessageContent>
                         {message.content}
                       </StyledMessageContent>
                     </StyledMessage>
-                  )
+                  )}
                 )
               ) : (
-                <></>
+                <>empty messages</>
               )}
-              {/* <StyledMessage elevation={0} position={"flex-start"}>
-                <Avatar src={user?.image} />
 
-                <StyledMessageContent>
-                  dfsdfxcxcvcvcxvxcvcxvxcvxc dfsdfxcxcvcvcxvxcdsc vcxvxcvxc
-                </StyledMessageContent>
-              </StyledMessage>
-
-              <StyledMessage elevation={0} position={"flex-end"}>
-                <Avatar src={selectedFriend?.image} />
-
-                <StyledMessageContent>
-                  sdsdsdsssssdddsdsdxzczxcasdasasdasdasdasdxxcdsfsdfsdfsdfsdfxcxcvcvcxvxcvcxvxcvxc
-                </StyledMessageContent>
-              </StyledMessage> */}
             </StyledList>
           </Box>
           <Divider />
@@ -255,10 +281,11 @@ const [messages,setMessages] = useState([])
                 onClick={async () => {
                   if (message !== "") {
                     try {
+                      console.log("selectedChat", selectedChat);
                       await saveMessage({
                         message,
                         sender: user?._id,
-                        destination: selectedFriend || "unknown",
+                        destination: selectedChat || "unknown",
                       });
                       console.log("message saved");
                     } catch (err) {
@@ -280,5 +307,6 @@ const [messages,setMessages] = useState([])
     </StyledBox>
   );
 }
+export const userId = ChatBar.userId;
 
 export default ChatBar;

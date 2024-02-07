@@ -12,8 +12,8 @@ import { useSelector } from "react-redux";
 import { selectUser } from "../../features/users/userSlice";
 
 function EditUsenameDialog({ isOpen, setIsOpen }) {
-
-  const user = useSelector(selectUser);
+// const userId = sessionStorage.getItem('userId')
+  const user = useSelector(selectUser); 
   const [open, setOpen] = useState(isOpen);
   const [updateUser, updateUserResult] = useUpdateUserMutation();
   const [isDisabled, setIsDisabled] = useState(true);

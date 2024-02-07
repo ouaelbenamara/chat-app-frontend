@@ -12,10 +12,13 @@ export const usersSlice = createSlice({
         setUsers: (state, action) => {
             console.log('exec',action.payload)
             state.users = action.payload
+        },
+        resetAllUsers:(state)=>{
+            state.users = []
         }
     }
 })
-export const { setUsers} = usersSlice.actions;
+export const { resetAllUsers,setUsers} = usersSlice.actions;
 export default usersSlice.reducer;
 export const selectAllUsers = (state) => state?.allUsers.users
 
